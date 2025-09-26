@@ -1,0 +1,17 @@
+C:\Users\Lenovo\Desktop\Kripto\Kriptoloji1\ServerClient\ServerClient\bin\Debug\net8.0-windows\ServerClient.exe
+C:\Users\Lenovo\Desktop\Kripto\Kriptoloji1\ServerClient\ServerClient\bin\Debug\net8.0-windows\ServerClient.deps.json
+C:\Users\Lenovo\Desktop\Kripto\Kriptoloji1\ServerClient\ServerClient\bin\Debug\net8.0-windows\ServerClient.runtimeconfig.json
+C:\Users\Lenovo\Desktop\Kripto\Kriptoloji1\ServerClient\ServerClient\bin\Debug\net8.0-windows\ServerClient.dll
+C:\Users\Lenovo\Desktop\Kripto\Kriptoloji1\ServerClient\ServerClient\bin\Debug\net8.0-windows\ServerClient.pdb
+C:\Users\Lenovo\Desktop\Kripto\Kriptoloji1\ServerClient\ServerClient\obj\Debug\net8.0-windows\ServerClient.Form1.resources
+C:\Users\Lenovo\Desktop\Kripto\Kriptoloji1\ServerClient\ServerClient\obj\Debug\net8.0-windows\ServerClient.csproj.GenerateResource.cache
+C:\Users\Lenovo\Desktop\Kripto\Kriptoloji1\ServerClient\ServerClient\obj\Debug\net8.0-windows\ServerClient.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Lenovo\Desktop\Kripto\Kriptoloji1\ServerClient\ServerClient\obj\Debug\net8.0-windows\ServerClient.AssemblyInfoInputs.cache
+C:\Users\Lenovo\Desktop\Kripto\Kriptoloji1\ServerClient\ServerClient\obj\Debug\net8.0-windows\ServerClient.AssemblyInfo.cs
+C:\Users\Lenovo\Desktop\Kripto\Kriptoloji1\ServerClient\ServerClient\obj\Debug\net8.0-windows\ServerClient.csproj.CoreCompileInputs.cache
+C:\Users\Lenovo\Desktop\Kripto\Kriptoloji1\ServerClient\ServerClient\obj\Debug\net8.0-windows\ServerClient.sourcelink.json
+C:\Users\Lenovo\Desktop\Kripto\Kriptoloji1\ServerClient\ServerClient\obj\Debug\net8.0-windows\ServerClient.dll
+C:\Users\Lenovo\Desktop\Kripto\Kriptoloji1\ServerClient\ServerClient\obj\Debug\net8.0-windows\refint\ServerClient.dll
+C:\Users\Lenovo\Desktop\Kripto\Kriptoloji1\ServerClient\ServerClient\obj\Debug\net8.0-windows\ServerClient.pdb
+C:\Users\Lenovo\Desktop\Kripto\Kriptoloji1\ServerClient\ServerClient\obj\Debug\net8.0-windows\ServerClient.genruntimeconfig.cache
+C:\Users\Lenovo\Desktop\Kripto\Kriptoloji1\ServerClient\ServerClient\obj\Debug\net8.0-windows\ref\ServerClient.dll
