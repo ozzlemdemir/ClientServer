@@ -111,7 +111,8 @@ def handle_client(conn, addr):
                 mesaj_ekle("BAĞLANTI", f"Client bağlantıyı kesti: {addr}")
                 break
 
-            mesaj = sezar_coz(data.decode("utf-8"))
+            #mesaj = sezar_coz(data.decode("utf-8"))
+            mesaj=data.decode("utf-8")
             mesaj_ekle("CLIENT", f"({addr[1]}): {mesaj}")
 
             if mesaj.lower() == "exit":

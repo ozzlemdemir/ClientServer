@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 from tkinter import scrolledtext
 import socket
 import threading
@@ -67,9 +68,15 @@ def mesajlari_dinle():
         except:
             break # Bağlantı koparsa döngüyü sonlandır
 
+
 def mesaj_gonder():
     """Giriş kutusundaki mesajı server'a gönderir."""
-    mesaj = sezar_sifrele(entry_girdi.get().strip())
+    secilen_sifreleme = combo.get()
+    if secilen_sifreleme=="Sezar":
+      mesaj = sezar_sifrele(entry_girdi.get().strip())
+    else:
+      mesaj = entry_girdi.get().strip()
+
     if mesaj:
         mesaj_ekle("SEN", mesaj)
         client_socket.send(mesaj.encode("utf-8"))
@@ -92,6 +99,14 @@ root = tk.Tk()
 root.title("Python Chat Client")
 
 # Mesaj Alanı
+
+combo = ttk.Combobox()
+combo.place(x=50, y=50)
+combo.label = tk.Label(root, text="Şifreleme Yöntemi Seçin:")
+combo.label.pack()
+combo = ttk.Combobox(root, values=["Sezar", "Normal"])
+combo.pack()
+
 mesaj_alani = scrolledtext.ScrolledText(root, wrap=tk.WORD, state=tk.DISABLED, height=15, width=50)
 mesaj_alani.pack(padx=10, pady=10)
 
