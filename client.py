@@ -4,8 +4,7 @@ from tkinter import scrolledtext
 import socket
 import threading
 import sys
-
-from sezar import sezar_sifrele
+from sezar import Sezar
 
 
 host_input = input("Sunucu IP adresini girinnn (varsayılan: 127.0.0.1): ")
@@ -71,9 +70,10 @@ def mesajlari_dinle():
 
 def mesaj_gonder():
     """Giriş kutusundaki mesajı server'a gönderir."""
+    sezar=Sezar()
     secilen_sifreleme = combo.get()
     if secilen_sifreleme=="Sezar":
-      mesaj = sezar_sifrele(entry_girdi.get().strip())
+      mesaj = sezar.sezar_sifrele(entry_girdi.get().strip(),int(entry_anahtar.get()))#burada entry_anahtar ı aldık ve sezar dosyasındaki fonksiyona gönderdik
     else:
       mesaj = entry_girdi.get().strip()
 
@@ -100,12 +100,17 @@ root.title("Python Chat Client")
 
 # Mesaj Alanı
 
-combo = ttk.Combobox()
-combo.place(x=50, y=50)
-combo.label = tk.Label(root, text="Şifreleme Yöntemi Seçin:")
-combo.label.pack()
-combo = ttk.Combobox(root, values=["Sezar", "Normal"])
+label_sifreleme = tk.Label(root, text="Şifreleme Yöntemi Seçin:")
+label_sifreleme.pack()
+combo = ttk.Combobox(root, values=["Sezar", "Normal"], state="readonly")
+combo.current(0)  #varsayılan :Sezar
 combo.pack()
+
+label_anahtar = tk.Label(root, text="Anahtar girin : ")
+label_anahtar.pack()
+
+entry_anahtar = tk.Entry(root, width=20)
+entry_anahtar.pack()
 
 mesaj_alani = scrolledtext.ScrolledText(root, wrap=tk.WORD, state=tk.DISABLED, height=15, width=50)
 mesaj_alani.pack(padx=10, pady=10)

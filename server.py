@@ -3,7 +3,7 @@ from tkinter import scrolledtext
 import socket
 import threading
 import sys
-from sezar import sezar_coz
+#from sezar import sezar_coz
 
 
 
@@ -17,6 +17,7 @@ HOST = host_input if host_input else "127.0.0.1"
 
 port_input = input("Sunucu port numarasını girin (varsayılan: 12345): ")
 PORT = 0 # PORT'u başlangıçta tanımla
+conn=None
 
 if not port_input:
     # Kullanıcı boş bıraktıysa varsayılan portu kullan
@@ -33,32 +34,20 @@ else:
             PORT = 12345
             
     except ValueError:
-        # Giriş sayıya çevrilemezse hata ver ve varsayılanı kullan
-        print(f"HATA: Port numarası ('{port_input}') geçerli bir sayı değil. Varsayılan (12345) kullanılıyor.")
+        print(f"geçersiz port numarası")
         PORT = 12345
-    except Exception as e:
-        # Diğer beklenmedik hatalar
-        print(f"Bilinmeyen bir hata oluştu: {e}")
-        sys.exit() # Programı kapat
 
 print(f"\nSunucu Başlatılıyor: IP={HOST}, PORT={PORT}")
 
 SERVER_RUNNING = False
-client_connections = [] # Aktif istemci bağlantılarını (socket objelerini) tutacak liste
-
-# --- 1. Socket İşlemlerini Yöneten Fonksiyonlar ---
+#client_connections = [] # Aktif istemci bağlantılarını (socket objelerini) tutacak liste
 
 def start_server():
     """Sunucu soketini başlatır ve istemci bağlantılarını dinlemeyi başlatır."""
     global server_socket, SERVER_RUNNING
 
-    if SERVER_RUNNING:
-        mesaj_ekle("UYARI", "Sunucu zaten çalışıyor.")
-        return
-
     try:
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # Portun tekrar kullanılmasına izin ver
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         server_socket.bind((HOST, PORT))
         server_socket.listen()
@@ -80,14 +69,10 @@ def start_server():
         btn_gonder.config(state=tk.DISABLED)
 
 def accept_connections():
-    """Gelen istemci bağlantılarını kabul eder."""
+    """Gelen istemci bağlantısını kabul eder."""
     while SERVER_RUNNING:
         try:
             conn, addr = server_socket.accept()
-            
-            # Bağlantıyı aktif listeye ekle
-            client_connections.append(conn) 
-            
             mesaj_ekle("BAĞLANTI", f"Client bağlandı: {addr}")
             
             # Client'a ilk mesajı gönder
@@ -98,14 +83,12 @@ def accept_connections():
             
         except socket.error as e:
             if SERVER_RUNNING:
-                mesaj_ekle("HATA", f"Bağlantı kabul etme hatası: {e}")
-            break
+                mesaj_ekle("HATA", f"Bağlantı kabul hatası: {e}")
 
 def handle_client(conn, addr):
     """Belirli bir istemciden gelen mesajları dinler."""
-    while True:
+    while True: #sürekli dinle
         try:
-            
             data = conn.recv(1024)
             if not data:
                 mesaj_ekle("BAĞLANTI", f"Client bağlantıyı kesti: {addr}")
@@ -120,15 +103,11 @@ def handle_client(conn, addr):
                 conn.send("Görüşmek üzere!".encode("utf-8"))
                 break
 
-            # BURADA ARTIK OTOMATİK CEVAP YOK. Sunucu manuel yanıt bekleyecek.
+            
 
         except socket.error as e:
             mesaj_ekle("HATA", f"Client ({addr[1]}) ile iletişim hatası: {e}")
             break
-            
-    # Bağlantı koptuğunda socket'i listeden çıkar ve kapat
-    if conn in client_connections:
-        client_connections.remove(conn)
     conn.close()
 
 def stop_server():
@@ -138,19 +117,11 @@ def stop_server():
     if not SERVER_RUNNING:
         mesaj_ekle("UYARI", "Sunucu zaten durdu.")
         return
-
-    SERVER_RUNNING = False
-    
-    # Tüm client bağlantılarını kapat
-    for conn in client_connections[:]: # Listenin kopyası üzerinde döngü yap
-        try:
-            conn.close()
-            client_connections.remove(conn)
-        except:
-            pass
+    else:
+     SERVER_RUNNING = False
             
     try:
-        # Engellenen accept() çağrısını serbest bırakmak için dummy bağlantı
+       
         socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((HOST, PORT))
         server_socket.close()
         mesaj_ekle("SUNUCU", "Sunucu durduruldu.")
@@ -164,29 +135,22 @@ def stop_server():
 
 
 def send_server_response():
-    """Sunucu giriş kutusundaki mesajı alır ve bağlı tüm istemcilere yayınlar (broadcast)."""
-    mesaj = entry_girdi.get()
+    """Sunucudan istemciye mesaj gönderir."""
+    global conn
+    mesaj = entry_girdi.get().strip()
     if not mesaj:
         return
-        
-    if not client_connections:
-        mesaj_ekle("UYARI", "Gönderilecek aktif istemci yok.")
-        entry_girdi.delete(0, tk.END)
+
+    if not conn:
+        mesaj_ekle("UYARI", "Henüz istemci bağlı değil.")
         return
 
-    # Gönderme işlemi
-    gonderilen_sayi = 0
-    for conn in client_connections[:]: # Liste değişebileceği için kopyası üzerinde döngü yap
-        try:
-            conn.send(mesaj.encode("utf-8"))
-            gonderilen_sayi += 1
-        except:
-            # Bağlantı hatası varsa listeden çıkar
-            client_connections.remove(conn) 
-            
-    mesaj_ekle("SERVER", f"Broadcast ({gonderilen_sayi} Client'a): {mesaj}")
-    entry_girdi.delete(0, tk.END) # Giriş kutusunu temizle
-
+    try:
+        conn.send(mesaj.encode("utf-8"))
+        mesaj_ekle("SERVER", f"(Client'a): {mesaj}")
+        entry_girdi.delete(0, tk.END)
+    except socket.error as e:
+        mesaj_ekle("HATA", f"Mesaj gönderilemedi: {e}")
 
 # --- 2. Arayüz Fonksiyonları (Utility) ---
 
