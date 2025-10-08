@@ -4,14 +4,27 @@ from tkinter import scrolledtext
 import socket
 import threading
 import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sezar import Sezar
 
+
+#client_core.py
 
 host_input = input("Sunucu IP adresini girinnn (varsayılan: 127.0.0.1): ")
 HOST = host_input if host_input else "127.0.0.1"
 
 port_input = input("Sunucu port numarasını girin (varsayılan: 12345): ")
 PORT = 0 
+#arayuzden gelen alana atamak için global değişkenler
+root = None
+mesaj_alani = None
+entry_girdi = None
+btn_baglan = None
+btn_gonder = None
+combo = None
+entry_anahtar = None
+
 
 if not port_input:
     PORT = 12345
@@ -33,7 +46,6 @@ else:
 # --- 1. Arayüz Fonksiyonları ---
 
 def baglan_ve_dinle():
-    """Client bağlantısını kurar ve mesaj dinleme iş parçacığını (thread) başlatır."""
     global client_socket
 
     try:
@@ -44,15 +56,13 @@ def baglan_ve_dinle():
         # Arka planda mesajları dinleme fonksiyonu çalıştır
         threading.Thread(target=mesajlari_dinle, daemon=True).start()
 
-        # Arayüzdeki durumu güncelle
-        btn_baglan.config(state=tk.DISABLED) # Bağlan butonunu pasifleştir
-        btn_gonder.config(state=tk.NORMAL)   # Gönder butonunu aktifleştir
-
+        
+        btn_baglan.config(state=tk.DISABLED)
+        btn_gonder.config(state=tk.NORMAL)  
     except socket.error as e:
         mesaj_ekle("HATA", f"[Server aktif değil.] Hata: {e}")
 
 def mesajlari_dinle():
-    """Server'dan gelen mesajları sürekli dinler."""
     while True:
         try:
             data = client_socket.recv(1024)
@@ -61,11 +71,10 @@ def mesajlari_dinle():
                 break
             mesaj_ekle("SERVER", data.decode("utf-8"))
         except:
-            break # Bağlantı koparsa döngüyü sonlandır
+            break 
 
 
 def mesaj_gonder():
-    """Giriş kutusundaki mesajı server'a gönderir."""
     sezar=Sezar()
     secilen_sifreleme = combo.get()
     if secilen_sifreleme=="Sezar":
@@ -89,6 +98,7 @@ def mesaj_ekle(kaynak, metin):
     mesaj_alani.yview(tk.END) # En alta kaydır
     mesaj_alani.config(state=tk.DISABLED) # Salt okunur yap
 
+'''
 # --- 2. Arayüz Tasarımı (Ana Pencere) ---
 
 root = tk.Tk()
@@ -132,4 +142,4 @@ root.bind('<Return>', lambda event: mesaj_gonder())
 
 # --- 3. Uygulamayı Başlat ---
 
-root.mainloop()
+root.mainloop()'''

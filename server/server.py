@@ -5,19 +5,20 @@ import threading
 import sys
 #from sezar import sezar_coz
 
-
-
-#HOST = input("Sunucu IP adresini girin (varsayılan : ") #varsayılan adres :"127.0.0.1"
-# PORT_INPUT = input("Sunucu port numarasını girin (varsayılan 12345): ")
-#PORT=int(PORT_INPUT)
-#HOST="127.0.0.1"
-#PORT=12345
 host_input = input("Sunucu IP adresini girin (varsayılan: 127.0.0.1): ")
 HOST = host_input if host_input else "127.0.0.1"
 
 port_input = input("Sunucu port numarasını girin (varsayılan: 12345): ")
 PORT = 0 # PORT'u başlangıçta tanımla
+
 conn=None
+#guiden gelen alana atamak için global değişkenler
+root = None
+mesaj_alani = None
+entry_girdi = None
+btn_start = None
+btn_stop = None
+btn_gonder = None
 
 if not port_input:
     # Kullanıcı boş bıraktıysa varsayılan portu kullan
@@ -27,12 +28,6 @@ else:
         # Tırnak işaretlerini (", ') ve boşlukları temizleyerek int'e çevir
         temiz_port = port_input.strip().strip('"').strip("'")
         PORT = int(temiz_port)
-        
-        # Portun geçerli bir aralıkta olup olmadığını kontrol et
-        if not (1024 <= PORT <= 65535):
-            print("UYARI: Port numarası 1024 ile 65535 arasında olmalıdır. Varsayılan (12345) kullanılıyor.")
-            PORT = 12345
-            
     except ValueError:
         print(f"geçersiz port numarası")
         PORT = 12345
@@ -40,7 +35,6 @@ else:
 print(f"\nSunucu Başlatılıyor: IP={HOST}, PORT={PORT}")
 
 SERVER_RUNNING = False
-#client_connections = [] # Aktif istemci bağlantılarını (socket objelerini) tutacak liste
 
 def start_server():
     """Sunucu soketini başlatır ve istemci bağlantılarını dinlemeyi başlatır."""
@@ -167,46 +161,3 @@ def on_closing():
     """Pencere kapatıldığında sunucuyu durdurur ve uygulamayı kapatır."""
     stop_server()
     root.destroy()
-
-
-# --- 3. Arayüz Tasarımı (Ana Pencere) ---
-
-root = tk.Tk()
-root.title("Python Chat Server")
-root.protocol("WM_DELETE_WINDOW", on_closing)
-
-# Mesaj Alanı
-mesaj_alani = scrolledtext.ScrolledText(root, wrap=tk.WORD, state=tk.DISABLED, height=15, width=60)
-mesaj_alani.pack(padx=10, pady=10)
-
-# Butonlar için Frame
-button_frame = tk.Frame(root)
-button_frame.pack(padx=10, pady=(0, 10))
-
-# Başlat Butonu
-btn_start = tk.Button(button_frame, text="SERVER'I BAŞLAT", command=start_server, fg="green")
-btn_start.pack(side=tk.LEFT, padx=5)
-
-# Durdur Butonu
-btn_stop = tk.Button(button_frame, text="SERVER'I DURDUR", command=stop_server, fg="red", state=tk.DISABLED)
-btn_stop.pack(side=tk.LEFT, padx=5)
-
-# Mesaj gönderme alanı (Entry ve Button)
-input_frame = tk.Frame(root)
-input_frame.pack(padx=10, pady=(0, 10))
-
-# Mesaj Giriş Kutusu
-entry_girdi = tk.Entry(input_frame, width=50)
-entry_girdi.pack(side=tk.LEFT, padx=(0, 5))
-
-# Gönder Butonu (Başlangıçta pasif)
-btn_gonder = tk.Button(input_frame, text="Yanıt Gönder (Tüm Client'lara)", command=send_server_response, state=tk.DISABLED)
-btn_gonder.pack(side=tk.LEFT)
-
-# Enter tuşuna basıldığında mesaj gönderme işlevi ekle
-root.bind('<Return>', lambda event: send_server_response())
-
-
-# --- 4. Uygulamayı Başlat ---
-
-root.mainloop()
