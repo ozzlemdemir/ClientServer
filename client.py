@@ -28,10 +28,6 @@ else:
     except ValueError:
         print(f"HATA: Port numarası ('{port_input}') geçerli bir sayı değil. Varsayılan (12345) kullanılıyor.")
         PORT = 12345
-    except Exception as e:
-        # Diğer beklenmedik hatalar
-        print(f"Bilinmeyen bir hata oluştu: {e}")
-        sys.exit() # Programı kapat
 
 
 # --- 1. Arayüz Fonksiyonları ---
@@ -45,7 +41,7 @@ def baglan_ve_dinle():
         client_socket.connect((HOST, PORT))
         mesaj_ekle("BAĞLANTI", f"Server'a bağlandın: {HOST}:{PORT}")
 
-        # Mesaj dinleme işlemini ayrı bir iş parçacığında başlat
+        # Arka planda mesajları dinleme fonksiyonu çalıştır
         threading.Thread(target=mesajlari_dinle, daemon=True).start()
 
         # Arayüzdeki durumu güncelle

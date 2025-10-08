@@ -71,10 +71,12 @@ def start_server():
 def accept_connections():
     """Gelen istemci bağlantısını kabul eder."""
     while SERVER_RUNNING:
+        global conn 
         try:
             conn, addr = server_socket.accept()
             mesaj_ekle("BAĞLANTI", f"Client bağlandı: {addr}")
-            
+             
+            conn = conn 
             # Client'a ilk mesajı gönder
             conn.send("Bağlantı başarılı. Mesajınızı yazabilirsiniz.".encode("utf-8"))
             
