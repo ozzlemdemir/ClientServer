@@ -32,7 +32,7 @@ class Vigenere:
             deger = self.harf_degeri(harf)
             sayisal_anahtar.append(deger)
         return sayisal_anahtar
-        print(sayisal_anahtar)
+
         
         
     def VigenereSifrele(self,sifresiz_metin,anahtar_kelime):
@@ -45,8 +45,12 @@ class Vigenere:
         for harf in sifresiz_metin_kucuk:
             harf_degeri = self.harf_degeri(harf)
             if harf_degeri is not None:
+                #metin boyu anahtar boyunu geçtiğinde başa döner
                 anahtar_degeri = anahtar_sayisal[anahtar_indeksi % anahtar_uzunluk]
-                sifreli_deger = ((harf_degeri - 1 + anahtar_degeri - 1) % self.alphabetLenght) + 1
+                 #alfabenin boyunu geçen değerleri garanti altına aldık mod ile
+                sifreli_deger = (harf_degeri + anahtar_degeri) % self.alphabetLenght
+                if sifreli_deger == 0:
+                    sifreli_deger = self.alphabetLenght
                 sifreli_harf = self.int_to_char[sifreli_deger]
                 anahtar_indeksi += 1
             else:
@@ -55,5 +59,4 @@ class Vigenere:
         return sifreli_metin
     
 
-v = Vigenere()
-print(v.VigenereSifrele( "afyonkarahisar","araba"))
+
