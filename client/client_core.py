@@ -7,6 +7,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sezar import Sezar
+from vigenere import Vigenere
 
 
 #client_core.py
@@ -76,9 +77,12 @@ def mesajlari_dinle():
 
 def mesaj_gonder():
     sezar=Sezar()
+    vigenere=Vigenere()
     secilen_sifreleme = combo.get()
     if secilen_sifreleme=="Sezar":
       mesaj = sezar.sezar_sifrele(entry_girdi.get().strip(),int(entry_anahtar.get()))#burada entry_anahtar ı aldık ve sezar dosyasındaki fonksiyona gönderdik
+    elif secilen_sifreleme=="Vigenere":
+        mesaj = vigenere.VigenereSifrele(entry_girdi.get().strip(),(entry_anahtar.get()))
     else:
       mesaj = entry_girdi.get().strip()
 
@@ -98,48 +102,3 @@ def mesaj_ekle(kaynak, metin):
     mesaj_alani.yview(tk.END) # En alta kaydır
     mesaj_alani.config(state=tk.DISABLED) # Salt okunur yap
 
-'''
-# --- 2. Arayüz Tasarımı (Ana Pencere) ---
-
-root = tk.Tk()
-root.title("Python Chat Client")
-
-# Mesaj Alanı
-
-label_sifreleme = tk.Label(root, text="Şifreleme Yöntemi Seçin:")
-label_sifreleme.pack()
-combo = ttk.Combobox(root, values=["Sezar", "Normal"], state="readonly")
-combo.current(0)  #varsayılan :Sezar
-combo.pack()
-
-label_anahtar = tk.Label(root, text="Anahtar girin : ")
-label_anahtar.pack()
-
-entry_anahtar = tk.Entry(root, width=20)
-entry_anahtar.pack()
-
-mesaj_alani = scrolledtext.ScrolledText(root, wrap=tk.WORD, state=tk.DISABLED, height=15, width=50)
-mesaj_alani.pack(padx=10, pady=10)
-
-# Giriş Kutusu ve Butonlar için Frame
-input_frame = tk.Frame(root)
-input_frame.pack(padx=10, pady=(0, 10))
-
-# Mesaj Giriş Kutusu
-entry_girdi = tk.Entry(input_frame, width=40)
-entry_girdi.pack(side=tk.LEFT, padx=(0, 5))
-
-# Gönder Butonu
-btn_gonder = tk.Button(input_frame, text="Gönder", command=mesaj_gonder, state=tk.DISABLED)
-btn_gonder.pack(side=tk.LEFT)
-
-# Bağlan Butonu (Giriş kutusu ve butondan ayrı bir yerde)
-btn_baglan = tk.Button(root, text="SERVER'A BAĞLAN", command=lambda: threading.Thread(target=baglan_ve_dinle, daemon=True).start())
-btn_baglan.pack(pady=(0, 10))
-
-# Enter tuşuna basıldığında mesaj gönderme işlevi ekle
-root.bind('<Return>', lambda event: mesaj_gonder())
-
-# --- 3. Uygulamayı Başlat ---
-
-root.mainloop()'''
