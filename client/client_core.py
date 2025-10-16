@@ -8,6 +8,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sezar import Sezar
 from vigenere import Vigenere
+from railFence import RailFence
 
 
 #client_core.py
@@ -57,7 +58,6 @@ def baglan_ve_dinle():
         # Arka planda mesajları dinleme fonksiyonu çalıştır
         threading.Thread(target=mesajlari_dinle, daemon=True).start()
 
-        
         btn_baglan.config(state=tk.DISABLED)
         btn_gonder.config(state=tk.NORMAL)  
     except socket.error as e:
@@ -78,11 +78,14 @@ def mesajlari_dinle():
 def mesaj_gonder():
     sezar=Sezar()
     vigenere=Vigenere()
+    railFence=RailFence()
     secilen_sifreleme = combo.get()
     if secilen_sifreleme=="Sezar":
       mesaj = sezar.sezar_sifrele(entry_girdi.get().strip(),int(entry_anahtar.get()))#burada entry_anahtar ı aldık ve sezar dosyasındaki fonksiyona gönderdik
     elif secilen_sifreleme=="Vigenere":
         mesaj = vigenere.VigenereSifrele(entry_girdi.get().strip(),(entry_anahtar.get()))
+    elif secilen_sifreleme=="Rail Fence":
+        mesaj=railFence.railFenceSifreleme(int(entry_anahtar.get()),entry_girdi.get().strip())
     else:
       mesaj = entry_girdi.get().strip()
 
@@ -101,4 +104,3 @@ def mesaj_ekle(kaynak, metin):
     mesaj_alani.insert(tk.END, f"[{kaynak}]: {metin}\n")
     mesaj_alani.yview(tk.END) # En alta kaydır
     mesaj_alani.config(state=tk.DISABLED) # Salt okunur yap
-
