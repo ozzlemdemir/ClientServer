@@ -13,7 +13,7 @@ class Sezar:
             sifreli_mesaj += self.alphabet[(self.alphabet.index(i) + anahtar) % len(self.alphabet)]
         return sifreli_mesaj
 
-    @staticmethod
+   
     def sezar_coz(self,encrypted_message, anahtar):
         sifresiz_mesaj = ''
         for i in encrypted_message:
