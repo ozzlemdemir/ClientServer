@@ -10,6 +10,7 @@ from sezar import Sezar
 from vigenere import Vigenere
 from railFence import RailFence
 from routeChiper import RoteChiper
+from substitutionChiper import SubstituionChiper
 
 #client_core.py
 
@@ -58,8 +59,8 @@ def baglan_ve_dinle():
         # Arka planda mesajları dinleme fonksiyonu çalıştır
         threading.Thread(target=mesajlari_dinle, daemon=True).start()
 
-        btn_baglan.config(state=tk.DISABLED) # type: ignore
-        btn_gonder.config(state=tk.NORMAL)   # type: ignore
+        btn_baglan.config(state=tk.DISABLED)
+        btn_gonder.config(state=tk.NORMAL)  
     except socket.error as e:
         mesaj_ekle("HATA", f"[Server aktif değil.] Hata: {e}")
 
@@ -80,35 +81,40 @@ def mesaj_gonder():
     vigenere=Vigenere()
     railFence=RailFence()
     routeChiper=RoteChiper()
-    secilen_sifreleme = combo.get() # type: ignore
+    secilen_sifreleme = combo.get() 
     if secilen_sifreleme=="Sezar":
-      mesaj = sezar.sezar_sifrele(entry_girdi.get().strip(),int(entry_anahtar.get()))# type: ignore #burada entry_anahtar ı aldık ve sezar dosyasındaki fonksiyona gönderdik
+      mesaj = sezar.sezar_sifrele(entry_girdi.get().strip(),int(entry_anahtar.get())) #burada entry_anahtar ı aldık ve sezar dosyasındaki fonksiyona gönderdik
       
     elif secilen_sifreleme=="Vigenere":
-        mesaj = vigenere.VigenereSifrele(entry_girdi.get().strip(),(entry_anahtar.get())) # type: ignore
+        mesaj = vigenere.VigenereSifrele(entry_girdi.get().strip(),(entry_anahtar.get())) 
         
     elif secilen_sifreleme=="Rail Fence":
-        mesaj=railFence.railFenceSifreleme(int(entry_anahtar.get()),entry_girdi.get().strip()) # type: ignore
+        mesaj=railFence.railFenceSifreleme(int(entry_anahtar.get()),entry_girdi.get().strip()) 
         
     elif secilen_sifreleme=="Route Chiper":
-        matris=routeChiper.metin_matrisi_olustur(entry_girdi.get(),int(entry_anahtar.get())) # type: ignore
+        matris=routeChiper.metin_matrisi_olustur(entry_girdi.get(),int(entry_anahtar.get())) 
         mesaj=routeChiper.spiral_sag_ust_baslangic(matris)
         
+    elif secilen_sifreleme=="Substituion Chiper":
+        anahtar = int(entry_anahtar.get().strip())
+        substituionChiper=SubstituionChiper(anahtar)
+        mesaj=substituionChiper.sifrele(entry_girdi.get()) 
+        
     else:
-      mesaj = entry_girdi.get().strip() # type: ignore
+      mesaj = entry_girdi.get().strip()
 
     if mesaj:
         mesaj_ekle("SEN", mesaj)
         client_socket.send(mesaj.encode("utf-8"))
-        entry_girdi.delete(0, tk.END) # type: ignore # Giriş kutusunu temizle
+        entry_girdi.delete(0, tk.END)  # Giriş kutusunu temizle
 
         if mesaj.lower() == "exit":
             client_socket.close()
-            root.quit() # type: ignore
+            root.quit() 
 
 def mesaj_ekle(kaynak, metin):
     """Gelen/Giden mesajları ana mesaj alanına ekler."""
-    mesaj_alani.config(state=tk.NORMAL) # type: ignore # Yazılabilir yap
-    mesaj_alani.insert(tk.END, f"[{kaynak}]: {metin}\n") # type: ignore
-    mesaj_alani.yview(tk.END) # type: ignore # En alta kaydır
-    mesaj_alani.config(state=tk.DISABLED) # type: ignore # Salt okunur yap
+    mesaj_alani.config(state=tk.NORMAL) # Yazılabilir yap
+    mesaj_alani.insert(tk.END, f"[{kaynak}]: {metin}\n") 
+    mesaj_alani.yview(tk.END) # En alta kaydır
+    mesaj_alani.config(state=tk.DISABLED)  # Salt okunur yap
