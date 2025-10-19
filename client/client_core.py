@@ -11,6 +11,8 @@ from vigenere import Vigenere
 from railFence import RailFence
 from routeChiper import RoteChiper
 from substitutionChiper import SubstituionChiper
+from playFair import PlayfairCipher
+from affineChiper import AffineCipher
 
 #client_core.py
 
@@ -99,6 +101,18 @@ def mesaj_gonder():
         anahtar = int(entry_anahtar.get().strip())
         substituionChiper=SubstituionChiper(anahtar)
         mesaj=substituionChiper.sifrele(entry_girdi.get()) 
+    elif secilen_sifreleme=="Play Fair":
+        anahtar=entry_anahtar.get()
+        playfair=PlayfairCipher(anahtar)
+        sifrelenecek=entry_girdi.get()
+        mesaj=playfair.playfair_sifrele(sifrelenecek)
+    elif secilen_sifreleme=="Affine":
+        parcalar = entry_anahtar.get().split(',')
+        a = int(parcalar[0].strip())
+        b = int(parcalar[1].strip())
+        affine=AffineCipher(a,b)
+        mesaj=affine.encrypt(entry_girdi.get())
+        
         
     else:
       mesaj = entry_girdi.get().strip()
