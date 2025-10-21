@@ -83,15 +83,38 @@ def accept_connections():
 
 def handle_client(conn, addr):
     """Belirli bir istemciden gelen mesajları dinler."""
-    while True: #sürekli dinle
+    dosya_alma_modu = False
+    dosya = None
+
+    while True:
         try:
             data = conn.recv(1024)
             if not data:
                 mesaj_ekle("BAĞLANTI", f"Client bağlantıyı kesti: {addr}")
                 break
 
-            #mesaj = sezar_coz(data.decode("utf-8"))
-            mesaj=data.decode("utf-8")
+            # gelen dosya ise buraya girer
+            if data.startswith(b"[FILE]"):
+                mesaj_ekle("SERVER", "Pipgen dosyası alınıyor...")
+                dosya_alma_modu = True
+                dosya = open("gelen_pipgen.zip", "wb")
+                data = data[len(b"[FILE]"):] 
+
+                if data:
+                    dosya.write(data)
+                continue
+
+            if dosya_alma_modu:
+                dosya.write(data)
+                # Eğer data 1024 byte’tan küçükse, aktarım bitmiştir
+                if len(data) < 1024:
+                    dosya.close()
+                    mesaj_ekle("SERVER", "Pipgen dosyası alındı ve 'gelen_pipgen.zip' olarak kaydedildi.")
+                    dosya_alma_modu = False
+                continue
+
+            # diğer şifrelemeler için
+            mesaj = data.decode("utf-8")
             mesaj_ekle("CLIENT", f"({addr[1]}): {mesaj}")
 
             if mesaj.lower() == "exit":
@@ -99,11 +122,12 @@ def handle_client(conn, addr):
                 conn.send("Görüşmek üzere!".encode("utf-8"))
                 break
 
-            
-
-        except socket.error as e:
+        except Exception as e:
             mesaj_ekle("HATA", f"Client ({addr[1]}) ile iletişim hatası: {e}")
             break
+
+    if dosya:
+        dosya.close()
     conn.close()
 
 def stop_server():

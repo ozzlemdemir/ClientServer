@@ -5,6 +5,7 @@ import socket
 import threading
 import sys
 import os
+import zipfile
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sezar import Sezar
 from vigenere import Vigenere
@@ -13,6 +14,8 @@ from routeChiper import RoteChiper
 from substitutionChiper import SubstituionChiper
 from playFair import PlayfairCipher
 from affineChiper import AffineCipher
+from polybiusChiper import PolybiusChiper
+from pipgenChiper import PipgenChiper
 
 #client_core.py
 
@@ -112,7 +115,31 @@ def mesaj_gonder():
         b = int(parcalar[1].strip())
         affine=AffineCipher(a,b)
         mesaj=affine.encrypt(entry_girdi.get())
-        
+    elif secilen_sifreleme=="Polybius Chiper":
+        polybius=PolybiusChiper()
+        mesaj=polybius.polybiusCipher(entry_girdi.get().strip())
+    elif secilen_sifreleme == "Pipgen Chiper":
+        from PIL import Image, ImageTk  # type: ignore
+        pipgen = PipgenChiper()
+        yollar = pipgen.pipgen_sifrele(entry_girdi.get().strip())
+
+        if not yollar:
+            mesaj_ekle("UYARI", "Hiçbir harf için resim bulunamadı.")
+            return
+
+        zip_yolu = "pipgen_mesaj.zip"
+        with zipfile.ZipFile(zip_yolu, "w") as zipf:
+            for yol in yollar:
+                zipf.write(yol, os.path.basename(yol))  # sadece dosya adını ekle
+
+        mesaj_ekle("SEN", f"Pipgen mesajı dosyaya kaydedildi: {zip_yolu}")
+
+        #sunucu tarafına gönderme
+        with open(zip_yolu, "rb") as f:
+            data = f.read()
+            client_socket.sendall(b"[FILE]" + data)
+        mesaj_ekle("BILGI", "Pipgen dosyası sunucuya gönderildi.")
+        return
         
     else:
       mesaj = entry_girdi.get().strip()
