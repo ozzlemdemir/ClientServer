@@ -16,6 +16,7 @@ from playFair import PlayfairCipher
 from affineChiper import AffineCipher
 from polybiusChiper import PolybiusChiper
 from pipgenChiper import PipgenChiper
+from hillChiper import HillCipher   
 
 #client_core.py
 
@@ -104,20 +105,29 @@ def mesaj_gonder():
         anahtar = int(entry_anahtar.get().strip())
         substituionChiper=SubstituionChiper(anahtar)
         mesaj=substituionChiper.sifrele(entry_girdi.get()) 
+        
     elif secilen_sifreleme=="Play Fair":
         anahtar=entry_anahtar.get()
         playfair=PlayfairCipher(anahtar)
         sifrelenecek=entry_girdi.get()
         mesaj=playfair.playfair_sifrele(sifrelenecek)
+        
     elif secilen_sifreleme=="Affine":
         parcalar = entry_anahtar.get().split(',')
         a = int(parcalar[0].strip())
         b = int(parcalar[1].strip())
         affine=AffineCipher(a,b)
         mesaj=affine.encrypt(entry_girdi.get())
+        
     elif secilen_sifreleme=="Polybius Chiper":
         polybius=PolybiusChiper()
         mesaj=polybius.polybiusCipher(entry_girdi.get().strip())
+        
+    elif secilen_sifreleme == "Hill Chiper":
+        hill_sifreleme=HillCipher(entry_anahtar.get().strip())
+        sifrelenecek_metin = entry_girdi.get().strip()
+        mesaj = hill_sifreleme.encrypt(sifrelenecek_metin)
+    
     elif secilen_sifreleme == "Pipgen Chiper":
         from PIL import Image, ImageTk  # type: ignore
         pipgen = PipgenChiper()
