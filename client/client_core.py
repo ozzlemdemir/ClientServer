@@ -17,6 +17,7 @@ from affineChiper import AffineCipher
 from polybiusChiper import PolybiusChiper
 from pipgenChiper import PipgenChiper
 from hillChiper import HillCipher   
+from DES_Chiper import SecureDES
 
 #client_core.py
 
@@ -127,12 +128,16 @@ def mesaj_gonder():
         hill_sifreleme=HillCipher(entry_anahtar.get().strip())
         sifrelenecek_metin = entry_girdi.get().strip()
         mesaj = hill_sifreleme.encrypt(sifrelenecek_metin)
+        
+    elif secilen_sifreleme== "DES":
+        des = SecureDES(entry_anahtar.get().strip())
+        mesaj = des.encrypt(entry_girdi.get().strip())
     
     elif secilen_sifreleme == "Pipgen Chiper":
         from PIL import Image, ImageTk  # type: ignore
         pipgen = PipgenChiper()
         yollar = pipgen.pipgen_sifrele(entry_girdi.get().strip())
-
+   
         if not yollar:
             mesaj_ekle("UYARI", "Hiçbir harf için resim bulunamadı.")
             return
