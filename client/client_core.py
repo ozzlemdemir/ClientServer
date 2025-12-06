@@ -7,6 +7,7 @@ import sys
 import os
 import zipfile
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from AES_Chiper import SecureAES
 from sezar import Sezar
 from vigenere import Vigenere
 from railFence import RailFence
@@ -134,6 +135,10 @@ def mesaj_gonder():
         des = SecureDES(entry_anahtar.get().strip())
         cipher = des.encrypt(entry_girdi.get().strip())
         mesaj = base64.b64encode(cipher).decode("utf-8") 
+        
+    elif secilen_sifreleme == "AES":
+        aes = SecureAES(entry_anahtar.get().strip())
+        mesaj = aes.encrypt(entry_girdi.get().strip())
     
     elif secilen_sifreleme == "Pipgen Chiper":
         from PIL import Image, ImageTk  # type: ignore

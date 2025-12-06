@@ -3,10 +3,7 @@ from Crypto.Cipher import DES
 from Crypto.Util.Padding import pad, unpad
 
 class SecureDES:
-    """
-    Kütüphanesiz DES CBC sınıfı.
-    Eğer pycryptodome yoksa bu kodu kullanabilirsiniz.
-    """
+   
 
     def __init__(self, key: str):
         key_bytes = key.encode("utf-8")
