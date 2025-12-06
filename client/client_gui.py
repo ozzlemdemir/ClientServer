@@ -27,23 +27,23 @@ class ClientGUI:
     mesaj_alani = scrolledtext.ScrolledText(root, wrap=tk.WORD, state=tk.DISABLED, height=15, width=50)
     mesaj_alani.pack(padx=10, pady=10)
 
-    # Giriş Kutusu ve Butonlar için Frame
+   
     input_frame = tk.Frame(root)
     input_frame.pack(padx=10, pady=(0, 10))
 
-    # Mesaj Giriş Kutusu
+    
     entry_girdi = tk.Entry(input_frame, width=40)
     entry_girdi.pack(side=tk.LEFT, padx=(0, 5))
 
-    # Gönder Butonu
+    
     btn_gonder = tk.Button(input_frame, text="Gönder", command=Client.mesaj_gonder, state=tk.DISABLED)
     btn_gonder.pack(side=tk.LEFT)
 
-    # Bağlan Butonu (Giriş kutusu ve butondan ayrı bir yerde)
+    
     btn_baglan = tk.Button(root, text="SERVER'A BAĞLAN", command=lambda: threading.Thread(target=Client.baglan_ve_dinle, daemon=True).start())
     btn_baglan.pack(pady=(0, 10))
 
-    # Enter tuşuna basıldığında mesaj gönderme işlevi ekle
+    
     root.bind('<Return>', lambda event: Client.mesaj_gonder())
 
     #TKİNTER ARAYÜZİNDEKİ WIDGETLARI CLIENT TARAFINDA KULLANMAK İÇİN

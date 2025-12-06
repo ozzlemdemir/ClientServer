@@ -18,6 +18,7 @@ from polybiusChiper import PolybiusChiper
 from pipgenChiper import PipgenChiper
 from hillChiper import HillCipher   
 from DES_Chiper import SecureDES
+import base64
 
 #client_core.py
 
@@ -131,7 +132,8 @@ def mesaj_gonder():
         
     elif secilen_sifreleme== "DES":
         des = SecureDES(entry_anahtar.get().strip())
-        mesaj = des.encrypt(entry_girdi.get().strip())
+        cipher = des.encrypt(entry_girdi.get().strip())
+        mesaj = base64.b64encode(cipher).decode("utf-8") 
     
     elif secilen_sifreleme == "Pipgen Chiper":
         from PIL import Image, ImageTk  # type: ignore
