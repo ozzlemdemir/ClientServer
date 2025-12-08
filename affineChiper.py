@@ -44,5 +44,17 @@ class AffineCipher:
                 ciphertext += char 
                 
         return ciphertext
+    def decrypt(self, ciphertext):
+        plaintext = ""
+        ciphertext = "".join(filter(str.isalpha, ciphertext.upper()))
 
+        for char in ciphertext:
+            if char in self.char_to_int:
+                y = self.char_to_int[char]
+                x = (self.a_inverse * (y - self.b)) % self.ALPHABET_SIZE #type: ignore
+                plaintext += self.int_to_char[x]
+            else:
+                plaintext += char
+
+        return plaintext
     

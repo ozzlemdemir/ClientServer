@@ -30,4 +30,12 @@ class SubstituionChiper:
                 sifreli_metin_listesi.append(karakter)
 
         return "".join(sifreli_metin_listesi)
-    
+    def desifrele(self, sifreli_metin: str) -> str:
+        cozulen_liste = []
+        for karakter in sifreli_metin:
+            if karakter in self.desifreleme_haritasi:
+                cozulen_liste.append(self.desifreleme_haritasi[karakter])
+            else:
+                cozulen_liste.append(karakter)
+        return "".join(cozulen_liste)
+

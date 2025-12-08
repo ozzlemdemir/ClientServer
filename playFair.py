@@ -77,3 +77,32 @@ class PlayfairCipher:
                 
         return result
 
+    def playfair_desifrele(self, ciphertext):
+        result = ""
+
+        for i in range(0, len(ciphertext), 2):
+            a, b = ciphertext[i], ciphertext[i + 1]
+            pos1 = self.konumu_bul(a)
+            pos2 = self.konumu_bul(b)
+
+            if pos1 is None or pos2 is None:
+                raise ValueError(
+                    f"Deşifreleme hatası: '{a}' veya '{b}' Playfair matrisinde bulunamadı."
+                )
+
+            r1, c1 = pos1
+            r2, c2 = pos2
+
+            # Aynı satır: sola kaydır
+            if r1 == r2:
+                result += self.square[r1][(c1 - 1) % 5] + self.square[r2][(c2 - 1) % 5]
+
+            # Aynı sütun: yukarı kaydır
+            elif c1 == c2:
+                result += self.square[(r1 - 1) % 5][c1] + self.square[(r2 - 1) % 5][c2]
+
+            # Dikdörtgen: köşe değişimi (şifrelemenin tam tersi DEĞİL, aynı işlem!)
+            else:
+                result += self.square[r1][c2] + self.square[r2][c1]
+
+        return result

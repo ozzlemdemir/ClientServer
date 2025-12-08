@@ -58,5 +58,33 @@ class Vigenere:
             sifreli_metin += sifreli_harf
         return sifreli_metin
     
+    def VigenereCoz(self, sifreli_metin, anahtar_kelime):
+        anahtar_sayisal = self.anahtar(anahtar_kelime)
+        anahtar_uzunluk = len(anahtar_sayisal)
+        cozulen_metin = ""
+        anahtar_indeksi = 0
+        sifreli_metin_kucuk = sifreli_metin.lower()
+
+        for harf in sifreli_metin_kucuk:
+            harf_degeri = self.harf_degeri(harf)
+            if harf_degeri is not None:
+                anahtar_degeri = anahtar_sayisal[anahtar_indeksi % anahtar_uzunluk]
+                
+                # Şifrelemede:  (harf + anahtar) yapıyorduk
+                # Çözmede:      (harf - anahtar) yapıyoruz
+                cozulen_deger = (harf_degeri - anahtar_degeri) % self.alphabetLenght
+                if cozulen_deger == 0:
+                    cozulen_deger = self.alphabetLenght
+
+                cozulen_harf = self.int_to_char[cozulen_deger]
+                anahtar_indeksi += 1
+            else:
+                cozulen_harf = harf
+
+            cozulen_metin += cozulen_harf
+
+        return cozulen_metin
+
+    
 
 

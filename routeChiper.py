@@ -57,5 +57,56 @@ class RoteChiper:
                 sag_sutun -= 1
                 
         return "".join(sonuc)
+    def spiral_sag_ust_baslangic_coz(self, sifreli_metin, yatay_uzunluk, dolgu_karakteri='*'):
+        import math
+
+        metin_uzunlugu = len(sifreli_metin)
+        dikey_uzunluk = math.ceil(metin_uzunlugu / yatay_uzunluk)
+
+        # Boş matris oluştur
+        matris = [['' for _ in range(yatay_uzunluk)] for _ in range(dikey_uzunluk)]
+
+        ust_satir = 0
+        alt_satir = dikey_uzunluk - 1
+        sol_sutun = 0
+        sag_sutun = yatay_uzunluk - 1
+
+        index = 0
+
+        # Spiral sırayla MATRİSE veri yerleştirme
+        while ust_satir <= alt_satir and sol_sutun <= sag_sutun:
+
+            # 1) Sağdan sola (üst satır)
+            for j in range(sag_sutun, sol_sutun - 1, -1):
+                matris[ust_satir][j] = sifreli_metin[index]
+                index += 1
+            ust_satir += 1
+
+            # 2) Yukarıdan aşağıya (sol sütunu)
+            if sol_sutun <= sag_sutun:
+                for i in range(ust_satir, alt_satir + 1):
+                    matris[i][sol_sutun] = sifreli_metin[index]
+                    index += 1
+                sol_sutun += 1
+
+            # 3) Soldan sağa (alt satır)
+            if ust_satir <= alt_satir:
+                for j in range(sol_sutun, sag_sutun + 1):
+                    matris[alt_satir][j] = sifreli_metin[index]
+                    index += 1
+                alt_satir -= 1
+
+            # 4) Aşağıdan yukarı (sağ sütun)
+            if sol_sutun <= sag_sutun:
+                for i in range(alt_satir, ust_satir - 1, -1):
+                    matris[i][sag_sutun] = sifreli_metin[index]
+                    index += 1
+                sag_sutun -= 1
+
+        # Matrisi satır satır okuyup çözülmüş metni oluştur
+        cozulen = "".join("".join(satir) for satir in matris)
+
+        # Dolgu karakterlerini kaldır
+        return cozulen.replace(dolgu_karakteri, "")
 
 

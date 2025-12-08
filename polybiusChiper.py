@@ -20,3 +20,26 @@ class PolybiusChiper:
             result += f"{row}{col}"
 
         return result
+    def polybiusDeCipher(self, code):
+        code = code.replace(" ", "")
+        plaintext = ""
+        for i in range(0, len(code), 2):
+            pair = code[i:i+2]
+
+            if len(pair) < 2 or not pair.isdigit():
+                continue
+
+            row = int(pair[0])
+            col = int(pair[1])
+
+            index = (row - 1) * 5 + (col - 1)
+            char_code = ord('a') + index
+
+            if char_code >= ord('j'):
+                char_code += 1 
+
+            char = chr(char_code)
+
+            plaintext += char
+
+        return plaintext
