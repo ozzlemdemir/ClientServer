@@ -19,6 +19,10 @@ from polybiusChiper import PolybiusChiper
 from pipgenChiper import PipgenChiper
 from hillChiper import HillCipher   
 from DES_Chiper import SecureDES
+from DES_Manuel import DES_Manual
+from AES_Manuel import AES_Manual
+from RSA_Manuel import RSA_Manual
+
 import base64
 
 #client_core.py
@@ -247,12 +251,115 @@ def mesaj_gonder():
 
         # Çöz
         decrypted = aes.decrypt(encrypted_b64)
-
+        
         mesaj = (
             "(AES)\n"
             f"ŞİFRELİ (BASE64): {encrypted_b64}\n"
             f"ÇÖZÜLMÜŞ: {decrypted}"
         )
+    elif secilen_sifreleme == "RSA":
+        from RSA_Chiper import SecureRSA
+        rsa = SecureRSA()
+
+        print("PUBLIC KEY:")
+        print(rsa.get_public_key_str())
+
+        print("\nPRIVATE KEY:")
+        print(rsa.get_private_key_str())
+
+
+        normal = entry_girdi.get().strip()
+
+        encrypted_b64 = rsa.encrypt(normal)
+        decrypted = rsa.decrypt(encrypted_b64)
+
+        mesaj = (
+            "(RSA)\n"
+            f"ŞİFRELİ (BASE64): {encrypted_b64}\n"
+            f"ÇÖZÜLMÜŞ: {decrypted}"
+        )
+        
+    elif secilen_sifreleme == "DES(Manuel)":
+        print("\n--- DES(Manuel) BLOĞUNA GİRDİ ---")
+
+        anahtar = entry_anahtar.get().strip()
+        normal = entry_girdi.get().strip()
+
+        print(f"[DEBUG] Girilen Anahtar: {anahtar}")
+        print(f"[DEBUG] Girilen Mesaj: {normal}")
+
+        des = DES_Manual(anahtar)
+        print("[DEBUG] DES_Manual sınıfı oluşturuldu")
+
+        try:
+            sifreli = des.encrypt(normal)
+            print(f"[DEBUG] Şifrelenen veri: {sifreli}")
+
+            desifre = des.decrypt(sifreli)
+            print(f"[DEBUG] Çözülen veri: {desifre}")
+        except Exception as e:
+            print(f"[HATA] DES Manuel işleminde hata oluştu: {e}")
+            mesaj = f"[HATA] DES Manuel hata: {e}"
+            
+            return {
+                "status": "fail",
+                "sifreleme": "DES(Manuel)",
+                "core": mesaj
+            }
+
+        mesaj = (
+            "(DES-MANUEL)\n"
+            f"ŞİFRELİ: {sifreli}\n"
+            f"ÇÖZÜLMÜŞ: {desifre}"
+        )
+
+        print("[DEBUG] Return paketi hazırlanıyor...")
+
+        return {
+            "status": "success",
+            "sifreleme": "DES (Manuel)",
+            "sifreli": sifreli,
+            "desifre": desifre,
+            "core": mesaj
+        }
+
+    elif secilen_sifreleme == "AES(Manuel)":
+        aes = AES_Manual(entry_anahtar.get().strip())
+
+        normal = entry_girdi.get().strip()
+        sifreli = aes.encrypt(normal)
+        desifre = aes.decrypt(sifreli)
+
+        mesaj = (
+            "(AES-MANUEL)\n"
+            f"ŞİFRELİ: {sifreli}\n"
+            f"ÇÖZÜLMÜŞ: {desifre}"
+        )
+
+        return {
+            "status": "success",
+            "sifreleme": "AES (Manuel)",
+            "sifreli": sifreli,
+            "desifre": desifre,
+            "core": mesaj
+        }
+
+
+    elif secilen_sifreleme == "DES(Manuel)":
+        des = DES_Manual(entry_anahtar.get().strip())
+
+        normal = entry_girdi.get().strip()
+        sifreli = des.encrypt(normal)
+        desifre = des.decrypt(sifreli)
+
+        mesaj = (
+            "(DES-MANUEL)\n"
+            f"ŞİFRELİ (BASE64): {sifreli}\n"
+            f"ÇÖZÜLMÜŞ: {desifre}"
+        )
+
+        client_socket.send(mesaj.encode("utf-8"))
+        mesaj_ekle("CLIENT", mesaj)
         
     elif secilen_sifreleme == "Pipgen Chiper":
         from PIL import Image, ImageTk  # type: ignore

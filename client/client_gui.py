@@ -14,7 +14,7 @@ class ClientGUI:
 
     label_sifreleme = tk.Label(root, text="Şifreleme Yöntemi Seçin:")
     label_sifreleme.pack()
-    combo = ttk.Combobox(root, values=["Sezar", "Normal","Vigenere","Rail Fence","Route Chiper","Substituion Chiper","Play Fair","Affine","Polybius Chiper","Pipgen Chiper","Hill Chiper","DES","AES"], state="readonly")
+    combo = ttk.Combobox(root, values=["Sezar", "Normal","Vigenere","Rail Fence","Route Chiper","Substituion Chiper","Play Fair","Affine","Polybius Chiper","Pipgen Chiper","Hill Chiper","DES","AES","RSA","DES(Manuel)","AES(Manuel)","RSA(Manuel)"], state="readonly")
     combo.current(0)  #varsayılan :Sezar
     combo.pack()
 
