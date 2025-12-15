@@ -15,6 +15,7 @@ class ServerGUI:
 
     button_frame = tk.Frame(root)
     button_frame.pack(padx=10, pady=(0, 10))
+    
 
     btn_start = tk.Button(button_frame, text="SERVER'I BAŞLAT", command=Server.start_server, fg="green")
     btn_start.pack(side=tk.LEFT, padx=5)
