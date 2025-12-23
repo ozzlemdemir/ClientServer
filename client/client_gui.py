@@ -14,7 +14,7 @@ class ClientGUI:
 
     label_sifreleme = tk.Label(root, text="Şifreleme Yöntemi Seçin:")
     label_sifreleme.pack()
-    combo = ttk.Combobox(root, values=["Sezar", "Normal","Vigenere","Rail Fence","Route Chiper","Substituion Chiper","Play Fair","Affine","Polybius Chiper","Pipgen Chiper","Hill Chiper","DES","AES","RSA","DES(Manuel)","AES(Manuel)","RSA(Manuel)"], state="readonly")
+    combo = ttk.Combobox(root, values=["Sezar", "Normal","Vigenere","Rail Fence","Route Chiper","Substituion Chiper","Play Fair","Affine","Polybius Chiper","Pipgen Chiper","Hill Chiper","DES","AES","RSA","DES(Manuel)","AES(Manuel)","RSA(Manuel)","ECC"], state="readonly")
     combo.current(0)  #varsayılan :Sezar
     combo.pack()
 
@@ -30,6 +30,12 @@ class ClientGUI:
    
     input_frame = tk.Frame(root)
     input_frame.pack(padx=10, pady=(0, 10))
+    label_bilgi = tk.Label(root, text="⚠️ Dosya seçmeden önce mutlaka anahtarınızı giriniz!", fg="red", font=("Arial", 9, "italic"))
+    label_bilgi.pack(pady=(10, 0))
+    btn_dosya = tk.Button(root, text="Dosya Şifrele ve Gönder", 
+                     command=Client.dosya_sifrele_ve_gonder, 
+                     bg="lightblue")
+    btn_dosya.pack(pady=5)
 
     
     entry_girdi = tk.Entry(input_frame, width=40)
@@ -54,6 +60,7 @@ class ClientGUI:
     Client.root = root
     Client.combo = combo
     Client.entry_anahtar = entry_anahtar
+    Client.btn_dosya = btn_dosya
 
 
     root.mainloop()

@@ -4,8 +4,8 @@ class DESCipher:
 
     def __init__(self):
         self.ROUNDS = 16
-        self.BLOCK_SIZE = 64 # Bit
-        self.BYTE_SIZE = 8   # Byte
+        self.BLOCK_SIZE = 64 
+        self.BYTE_SIZE = 8   
     
 
     def _xor_data(self, data1, data2):

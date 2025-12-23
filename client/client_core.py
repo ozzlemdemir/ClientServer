@@ -22,6 +22,11 @@ from DES_Chiper import SecureDES
 from DES_Manuel import DESCipher
 from AES_Manuel import SimpleAESCipher
 from RSA_Manuel import RSA_Manual
+from RSA_Chiper import SecureRSA
+from ECC_Chiper import SecureECC
+from tkinter import filedialog 
+import docx
+
 
 import base64
 
@@ -40,6 +45,7 @@ btn_baglan = None
 btn_gonder = None
 combo = None
 entry_anahtar = None
+btn_dosya = None
 
 
 if not port_input:
@@ -88,6 +94,56 @@ def mesajlari_dinle():
         except:
             break 
 ""
+
+#sonradan eklenen dosya işleme kısmı
+def dosya_sec_ve_oku():
+    """Dosya seçer ve içindeki metni döndürür."""
+    dosya_yolu = filedialog.askopenfilename(
+        title="Şifrelenecek Dosyayı Seçin",
+        filetypes=[("Text Dosyaları", "*.txt"), ("Word Dosyaları", "*.docx"), ("Tüm Dosyalar", "*.*")]
+    )
+    
+    if not dosya_yolu:
+        return None
+
+    try:
+        if dosya_yolu.endswith('.txt'):
+            with open(dosya_yolu, 'r', encoding='utf-8') as f:
+                return f.read()
+        
+        elif dosya_yolu.endswith('.docx'):
+            doc = docx.Document(dosya_yolu)
+            tam_metin = [para.text for para in doc.paragraphs]
+            return '\n'.join(tam_metin)
+            
+    except Exception as e:
+        mesaj_ekle("HATA", f"Dosya okunurken hata oluştu: {e}")
+        return None
+
+def dosya_sifrele_ve_gonder():
+    """Dosyadan okur, arayüzdeki yönteme göre şifreler ve gönderir."""
+    dosya_metni = dosya_sec_ve_oku()
+    
+    if dosya_metni:
+        # entry_girdi'ye geçici olarak dosya metnini yazıyoruz 
+        # (mesaj_gonder fonksiyonunun mevcut yapısını bozmamak için en kolay yol budur)
+        eski_mesaj = entry_girdi.get()
+        entry_girdi.delete(0, tk.END)
+        entry_girdi.insert(0, dosya_metni)
+        
+        # Mevcut şifreleme fonksiyonunuzu çağırın
+        mesaj_gonder()
+        
+        # İşlem bitince kutuyu temizleyebilir veya eski mesajı geri koyabilirsiniz
+        entry_girdi.delete(0, tk.END)
+        entry_girdi.insert(0, eski_mesaj)
+#sonradan eklenen kısmın sonu 
+
+
+
+
+
+
 
 def mesaj_gonder():
     sezar=Sezar()
@@ -258,26 +314,39 @@ def mesaj_gonder():
             f"ÇÖZÜLMÜŞ: {decrypted}"
         )
     elif secilen_sifreleme == "RSA":
-        from RSA_Chiper import SecureRSA
-        rsa = SecureRSA()
+        # Klasör yapılandırmana göre tam yollar:
+        public_path = os.path.join("client", "server_public.pem")
+        private_path = os.path.join("server", "server_private.pem")
 
-        print("PUBLIC KEY:")
-        print(rsa.get_public_key_str())
+        try:
+            # Sınıfı başlatırken yolları veriyoruz
+            rsa_islem = SecureRSA(public_key_path=public_path, private_key_path=private_path)
+            
+            normal_metin = entry_girdi.get().strip()
+            if not normal_metin:
+                mesaj_ekle("UYARI", "Lütfen bir mesaj girin.")
+                return
 
-        print("\nPRIVATE KEY:")
-        print(rsa.get_private_key_str())
+            # Şifreleme (Client tarafı)
+            sifreli = rsa_islem.encrypt(normal_metin)
+            
+            # Deşifreleme (Test amaçlı Client tarafında yapıyoruz)
+            # Normalde server_private.pem sadece serverda olur, 
+            # ama şu an aynı bilgisayarda olduğun için client da okuyabiliyor.
+            if rsa_islem.private_key:
+                cozulmus = rsa_islem.decrypt(sifreli)
+            else:
+                cozulmus = "[Sadece Sunucu Çözebilir]"
 
-
-        normal = entry_girdi.get().strip()
-
-        encrypted_b64 = rsa.encrypt(normal)
-        decrypted = rsa.decrypt(encrypted_b64)
-
-        mesaj = (
-            "(RSA)\n"
-            f"ŞİFRELİ (BASE64): {encrypted_b64}\n"
-            f"ÇÖZÜLMÜŞ: {decrypted}"
-        )
+            mesaj = (
+                "(RSA)\n"
+                f"ŞİFRELİ (BASE64): {sifreli}\n"
+                f"ÇÖZÜLMÜŞ: {cozulmus}"
+            )
+        except Exception as e:
+            # Hata durumunda Python'un dosyayı nerede aradığını tam olarak gör:
+            mesaj_ekle("HATA", f"RSA İşlemi başarısız: {e}\nAranan Yol: {os.path.abspath(public_path)}")
+            return
         
     elif secilen_sifreleme == "DES(Manuel)":
         des = DESCipher()
@@ -303,6 +372,48 @@ def mesaj_gonder():
             f"ŞİFRELİ (BASE64): {sifreli}\n"
             f"ÇÖZÜLMÜŞ: {cözülmüş}"
         )
+    elif secilen_sifreleme=="RSA(Manuel)":
+        rsa=RSA_Manual()
+        sifreli=rsa.encrypt(entry_girdi.get().strip())
+        cözülmüş=rsa.decrypt(sifreli)
+        mesaj = (
+            "(RSA-MANUEL)\n"
+            f"ŞİFRELİ (BASE64): {sifreli}\n"
+            f"ÇÖZÜLMÜŞ: {cözülmüş}"
+        )
+    elif secilen_sifreleme=="ECC":
+        # Klasör yapılandırmana göre tam yollar:
+        public_path = os.path.join("client", "ecc_public.pem")
+        private_path = os.path.join("server", "ecc_private.pem")
+
+        try:
+            # Sınıfı başlatırken yolları veriyoruz
+            ecc_islem = SecureECC(public_key_path=public_path, private_key_path=private_path)
+            
+            normal_metin = entry_girdi.get().strip()
+            if not normal_metin:
+                mesaj_ekle("UYARI", "Lütfen bir mesaj girin.")
+                return
+
+            # Şifreleme (Client tarafı)
+            sifreli = ecc_islem.encrypt(normal_metin)
+            
+            # Deşifreleme (Test amaçlı Client tarafında yapıyoruz)
+            # Normalde ecc_private.pem sadece serverda olur, 
+            # ama şu an aynı bilgisayarda olduğun için client da okuyabiliyor.
+            if ecc_islem.private_key:
+                cozulmus = ecc_islem.decrypt(sifreli)
+            else:
+                cozulmus = "[Sadece Sunucu Çözebilir]"
+
+            mesaj = (
+                "(ECC)\n"
+                f"ŞİFRELİ (BASE64): {sifreli}\n"
+                f"ÇÖZÜLMÜŞ: {cozulmus}"
+            )
+        except Exception as e:
+            mesaj_ekle("HATA", f"ECC İşlemi başarısız: {e}\nAranan Yol: {os.path.abspath(public_path)}")
+            return
         
     elif secilen_sifreleme == "Pipgen Chiper":
         from PIL import Image, ImageTk  # type: ignore
