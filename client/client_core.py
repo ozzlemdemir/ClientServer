@@ -7,7 +7,6 @@ import sys
 import os
 import zipfile
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from AES_Chiper import SecureAES
 from sezar import Sezar
 from vigenere import Vigenere
 from railFence import RailFence
@@ -17,7 +16,8 @@ from playFair import PlayfairCipher
 from affineChiper import AffineCipher
 from polybiusChiper import PolybiusChiper
 from pipgenChiper import PipgenChiper
-from hillChiper import HillCipher   
+from hillChiper import HillCipher 
+from AES_Chiper import SecureAES  
 from DES_Chiper import SecureDES
 from DES_Manuel import DESCipher
 from AES_Manuel import SimpleAESCipher
@@ -97,7 +97,6 @@ def mesajlari_dinle():
 
 #sonradan eklenen dosya işleme kısmı
 def dosya_sec_ve_oku():
-    """Dosya seçer ve içindeki metni döndürür."""
     dosya_yolu = filedialog.askopenfilename(
         title="Şifrelenecek Dosyayı Seçin",
         filetypes=[("Text Dosyaları", "*.txt"), ("Word Dosyaları", "*.docx"), ("Tüm Dosyalar", "*.*")]
@@ -138,12 +137,6 @@ def dosya_sifrele_ve_gonder():
         entry_girdi.delete(0, tk.END)
         entry_girdi.insert(0, eski_mesaj)
 #sonradan eklenen kısmın sonu 
-
-
-
-
-
-
 
 def mesaj_gonder():
     sezar=Sezar()
@@ -313,39 +306,31 @@ def mesaj_gonder():
             f"ŞİFRELİ (BASE64): {encrypted_b64}\n"
             f"ÇÖZÜLMÜŞ: {decrypted}"
         )
-    elif secilen_sifreleme == "RSA":
-        # Klasör yapılandırmana göre tam yollar:
+    elif secilen_sifreleme == "RSA(Anahtar Dağitimi)":
         public_path = os.path.join("client", "server_public.pem")
-        private_path = os.path.join("server", "server_private.pem")
-
+        
         try:
-            # Sınıfı başlatırken yolları veriyoruz
-            rsa_islem = SecureRSA(public_key_path=public_path, private_key_path=private_path)
+            rsa_islem = SecureRSA(public_key_path=public_path)
             
-            normal_metin = entry_girdi.get().strip()
-            if not normal_metin:
-                mesaj_ekle("UYARI", "Lütfen bir mesaj girin.")
-                return
-
-            # Şifreleme (Client tarafı)
-            sifreli = rsa_islem.encrypt(normal_metin)
+            # Geçici AES anahtarı 
+            import secrets
+            gecici_aes_anahtari = secrets.token_hex(8) 
+    
+            aes_islem = SecureAES(gecici_aes_anahtari)
+            sifreli_mesaj = aes_islem.encrypt(entry_girdi.get().strip())
             
-            # Deşifreleme (Test amaçlı Client tarafında yapıyoruz)
-            # Normalde server_private.pem sadece serverda olur, 
-            # ama şu an aynı bilgisayarda olduğun için client da okuyabiliyor.
-            if rsa_islem.private_key:
-                cozulmus = rsa_islem.decrypt(sifreli)
-            else:
-                cozulmus = "[Sadece Sunucu Çözebilir]"
-
+            # 5. AES ANAHTARINI RSA ile şifrele (Anahtar Dağıtımı Burasıdır)
+            sifreli_aes_key = rsa_islem.encrypt(gecici_aes_anahtari)
+            
+            # 6. Sunucuya gönderilecek birleşik paket
             mesaj = (
-                "(RSA)\n"
-                f"ŞİFRELİ (BASE64): {sifreli}\n"
-                f"ÇÖZÜLMÜŞ: {cozulmus}"
+                "(RSA-KEY-EXCHANGE)\n"
+                f"ŞİFRELİ_ANAHTAR: {sifreli_aes_key}\n"
+                f"ŞİFRELİ_MESAJ: {sifreli_mesaj}"
             )
+            
         except Exception as e:
-            # Hata durumunda Python'un dosyayı nerede aradığını tam olarak gör:
-            mesaj_ekle("HATA", f"RSA İşlemi başarısız: {e}\nAranan Yol: {os.path.abspath(public_path)}")
+            mesaj_ekle("HATA", f"RSA Anahtar Dağıtım Hatası: {e}")
             return
         
     elif secilen_sifreleme == "DES(Manuel)":
@@ -372,6 +357,7 @@ def mesaj_gonder():
             f"ŞİFRELİ (BASE64): {sifreli}\n"
             f"ÇÖZÜLMÜŞ: {cözülmüş}"
         )
+    
     elif secilen_sifreleme=="RSA(Manuel)":
         rsa=RSA_Manual()
         sifreli=rsa.encrypt(entry_girdi.get().strip())
@@ -381,6 +367,32 @@ def mesaj_gonder():
             f"ŞİFRELİ (BASE64): {sifreli}\n"
             f"ÇÖZÜLMÜŞ: {cözülmüş}"
         )
+    elif secilen_sifreleme == "RSA(Mesaj Şifreleme)":
+        public_path = os.path.join("client", "server_public.pem")
+        private_path = os.path.join("server", "server_private.pem")
+        
+        try:
+            rsa_islem = SecureRSA(public_key_path=public_path, private_key_path=private_path)
+            
+            normal_metin = entry_girdi.get().strip()
+            if not normal_metin:
+                mesaj_ekle("UYARI", "Lütfen bir mesaj girin.")
+                return
+            sifreli_mesaj = rsa_islem.encrypt(normal_metin)
+
+            if rsa_islem.private_key:
+                cozulmus_metin = rsa_islem.decrypt(sifreli_mesaj)
+            else:
+                cozulmus_metin = "[Özel Anahtar Yüklenemedi - Çözülemez]"
+
+            mesaj = (
+                "(RSA-DOĞRUDAN-ŞİFRELEME)\n"
+                f"ŞİFRELİ (BASE64): {sifreli_mesaj}\n"
+                f"ÇÖZÜLMÜŞ: {cozulmus_metin}"
+            )
+        except Exception as e:
+            mesaj_ekle("HATA", f"RSA İşlemi başarısız: {e}")
+            return
     elif secilen_sifreleme=="ECC":
         # Klasör yapılandırmana göre tam yollar:
         public_path = os.path.join("client", "ecc_public.pem")

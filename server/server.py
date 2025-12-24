@@ -3,6 +3,10 @@ from tkinter import scrolledtext
 import socket
 import threading
 import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from RSA_Chiper import SecureRSA
+from AES_Chiper import SecureAES
 #from sezar import sezar_coz
 
 host_input = input("Sunucu IP adresini girin (varsayılan: 127.0.0.1): ")
@@ -85,14 +89,30 @@ def handle_client(conn, addr):
     """Belirli bir istemciden gelen mesajları dinler."""
     dosya_alma_modu = False
     dosya = None
+    private_path = os.path.join("server", "server_private.pem")
+    rsa_server = SecureRSA(private_key_path=private_path)
 
     while True:
         try:
-            data = conn.recv(1024)
+            data = conn.recv(4096)
             if not data:
                 mesaj_ekle("BAĞLANTI", f"Client bağlantıyı kesti: {addr}")
                 break
-
+            mesaj = data.decode("utf-8", errors="ignore")
+            if "(RSA-KEY-EXCHANGE)" in mesaj:
+                lines = mesaj.split("\n")
+                enc_key = lines[1].replace("ŞİFRELİ_ANAHTAR: ", "").strip()
+                enc_msg = lines[2].replace("ŞİFRELİ_MESAJ: ", "").strip()
+       
+                cozulmus_aes_key = rsa_server.decrypt(enc_key)
+                
+                aes_islem = SecureAES(cozulmus_aes_key)
+                original_msg = aes_islem.decrypt(enc_msg)
+                
+                mesaj_ekle("RSA-DECODE", f"Kullanılan AES Key: {cozulmus_aes_key}\nÇözülen Mesaj: {original_msg}")
+            else:
+                mesaj_ekle("CLIENT", f"({addr[1]}): {mesaj}")
+                
             # gelen dosya ise buraya girer
             if data.startswith(b"[FILE]"):
                 mesaj_ekle("SERVER", "Pipgen dosyası alınıyor...")

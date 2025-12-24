@@ -9,5 +9,7 @@ from RSA_Chiper import SecureRSA
 # Doğrudan proje içindeki klasörleri hedefle
 
 SecureECC.generate_and_save_keys("server", "client")
+#RSA ile anahtar dağıtımı için public ve private key üretimi
+#SecureRSA.generate_and_save_keys("server", "client")
 
 print("Anahtarlar projenin içindeki server/ ve client/ klasörlerine kaydedildi.")
